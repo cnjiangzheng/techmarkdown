@@ -1,0 +1,167 @@
+{
+    
+    "identityKeyFiled": "UserId",
+    "timestampKey": "x-tif-timestamp",
+    "signatureKey": "x-tif-signature",
+    "nonceKey": "x-tif-nonce",
+    "uidKey": "x-tif-uid",
+    "uinfoKey": "x-tif-uinfo",
+    "extDataKey": "x-tif-ext",
+    "xProxyBy": "TIF-SmartGate",
+    "overAllRequestLimit": "240000",
+    "userRequestLimit": "120000",
+    "ipConnectionLimit": "30000",
+    "ipRequestLimit": "120000",
+    "responseHeadersFilter": " ",
+    "requestHeadersFilter": "",
+    "MasterRedisIP": "127.0.0.1",
+    "MasterRedisPort": "6379",
+    "LocalRedisIP": "127.0.0.1",
+    "LocalRedisPort": "16379",
+    "connectSocketTimeout": "300000",
+    "SafeReverseProxyIPRegexes": ["^10\\.2\\.2\\.\\d{1,3}$"],
+    "managementIPDic": {
+        "127.0.0.1": 1
+    },
+    "routeRule_$top": [{
+            "appName": "Invoke Internet Url",
+            "path": "^/Internet/([a-z0-9_.-]+\\.qq\\.com|ecognition\\.image\\.myqcloud\\.com)/",
+            "targetHost": "{req.parsedUrl.path.split('/', 3)[2]}",
+            "targetPath": "/",
+            "requestLimit": 120000,
+            "requestHeadersFilter": "delete headers['x-forwarded-for'];delete headers['x-tif-nonce']; delete headers['x-tif-timestamp']; delete headers['x-tif-ext']; delete headers['x-tif-signature']; delete headers['x-forwarded-for']; delete headers['x-tif-paasid'];",
+            "https": true
+        },
+        {
+            "appName": "Invoke eBus Internet Url",
+            "path": "^/Internet/(ebus|http)/[^\\/]+/",
+            "targetHost": "{req.parsedUrl.path.split('/', 4)[3]}",
+            "targetPath": "/",
+            "requestLimit": 120000,
+            "requestHeadersFilter": "delete headers['x-forwarded-for'];headers['x-tif-nonce']=req.headers['x-tif-nonce'] || ''",
+            "https": false,
+            "noAgent": true
+        },
+        {
+            "appName": "Invoke https eBus Internet Url (weixin.qq.com Health Check)",
+			"id":"NZNvCzdUxxhNmbzKYxxxneWpr4AU",
+            "path": "^/Internet/(sebus|https)/api.weixin.qq.com/",
+            "targetHost": "api.weixin.qq.com",
+            "targetPath": "/",
+			"validHealthCheckStatusCode":[200,404],
+			"healthCheckPath":"/",
+			"targetHostHeader":"api.weixin.qq.com",
+            "requestLimit": 120000,
+            "requestHeadersFilter": "delete headers['x-forwarded-for'];headers['x-tif-nonce']=req.headers['x-tif-nonce'] || '';",
+            "https": true,
+            "noAgent": true
+        }		,
+        {
+            "appName": "Invoke https eBus Internet Url",
+            "path": "^/Internet/(sebus|https)/[^\\/]+/",
+            "targetHost": "{req.parsedUrl.path.split('/', 4)[3]}",
+            "targetPath": "/",
+            "requestLimit": 120000,
+            "requestHeadersFilter": "delete headers['x-forwarded-for'];headers['x-tif-nonce']=req.headers['x-tif-nonce'] || '';",
+            "https": true,
+            "noAgent": true
+        },
+        {
+            "appName": "mini programs",
+            "path": "^(/tif/api/login|/api/mp/login)",
+            "targetPath": "$1",
+            "targetHost": "10.11.12.100:81",
+            "targetHostToken": "Tencent123",
+            "targetSelect": "balance",
+            "findHostKey": "req.headers['x-tif-did'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress",
+            "requestLimit": 120000,
+            "timeout": 600000,
+            "https": false 
+        },
+        {
+            "appName": "tif",
+            "path": "^/tif/",
+            "customMatcher": "return req.headers['x-tif-sid']",
+            "targetPath": "/tif/",
+            "targetHost": "10.11.12.100:81",
+            "targetSelect": "balance",
+            "findHostKey": "req.headers['x-tif-did'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress",
+            "targetHostToken": "Tencent123",
+            "requestLimit": 120000,
+            "timeout": 600000,
+            "https": false
+        }, {
+            "appName": "dgdapi",
+            "path": "^/api/",
+            "customMatcher": "return req.headers['x-tif-sid'];",
+            "targetPath": "/api/",
+            "targetHost": "10.11.12.100:81",
+            "targetSelect": "balance",
+            "findHostKey": "req.headers['x-tif-did'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress",
+            "targetHostToken": "Tencent123",
+            "requestLimit": 120000,
+            "timeout": 600000,
+            "https": false
+        },
+        {
+            "appName": "ebus",
+            "path": "^/ebus/",
+            "customMatcher": "return req.headers['x-tif-paasid']",
+            "requestHeadersFilter": "headers['x-tif-nonce']=req.headers['x-tif-nonce']",
+            "targetHost": "10.11.12.100:8081",
+            "useCookieHostKey": false,
+            "targetSelect": "consistentHash",
+            "targetPath": "/ebus/",
+            "requestLimit": 30000,
+            "timeout": 600000
+        },
+        {
+            "appName": "ebus",
+            "path": "^/ebus/",
+            "customMatcher": "return req.headers['x-tif-sid']",
+            "targetPath": "/ebus/",
+            "targetHost": "10.11.12.100:8081",
+            "targetSelect": "balance",
+            "findHostKey": "req.headers['x-tif-did'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress",
+            "requestLimit": 360000,
+            "targetHostToken": "Tencent123",
+            "timeout": 600000
+        }
+    ],
+    "routeRule_$bottom": [
+        {
+            "appName": "bottom",
+            "path": "^/",
+            "targetPath": "/",
+            "targetHost": "10.11.12.100:81",
+            "targetSelect": "balance",
+            "findHostKey": "req.headers['x-forwarded-for'] || req.connection.remoteAddress",
+            "requestHeadersFilter": "if (req.headers['host']) { headers['host']=headers['org-host']=req.headers['host']; }",
+            "targetHostToken": "Tencent123",
+            "requestLimit": 120000,
+            "timeout": 600000,
+            "https": false
+        }
+    ],
+    "connectRule_$top": [{
+            "appName": "internet connect",
+            "customMatcher": "return rule.targets[req.headers.host]",
+            "targets": {
+                "smtp.exmail.qq.com:465": 1
+            }
+        },
+        {
+            "customMatcher": "return (req.headers['host']||'').startsWith('172.16.') && req.headers['proxy-authorization']=='Basic dXNlcjpqbGtqZnVpZW8yOXNkZmsybmQhQGRhZA=='",
+            "connectSecondProxy": [
+                "19.15.63.44:80"
+            ]
+        },
+        {
+            "customMatcher": "return req.headers['proxy-authorization']=='Basic dXNlcjpqbGtqZnVpZW8yOXNkZmsybmQhQGRhZA=='"
+        }
+    ],
+    "secureConnectionHandler": "tlsSocket.disableRenegotiation()",
+    "httpsPort": 443,
+    "httpsCert": "",
+    "httpsKey": ""
+}
