@@ -1,0 +1,37 @@
+假设从A主机ssh登录B主机，用秘钥代替密码，步骤如下：
+
+ 
+
+1、在A主机上执行：ssh-keygen -t  rsa
+
+    一切默认，不用输入密码，生成两个文件：
+
+     /root/.ssh/id_rsa
+
+     /root/.ssh/id_rsa.pub
+
+ 
+
+2、生成authorized_keys文件：
+
+touch /root/.ssh/authorized_keys
+
+cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+
+chmod 700 /root/.ssh/id_rsa
+
+ 
+
+3、把authorized_keys文件拷贝到B主机上：
+
+scp /root/.ssh/authorized_keys root@xx.xx.xx.xx:/root/.ssh/
+
+如果B主机上没有/root/.ssh目录，则先登录到B主机上执行ssh-keygen -t  rsa，再拷贝authorized_keys文件。
+
+ 
+
+4、完成
+
+ 
+
+5、如果以后某个主机的IP发生了调整，SSH时出现如下错误，按照前面的操作重新执行一遍即可。

@@ -1,0 +1,11 @@
+#替换/etc/ssh/sshd_config文件的两个参数
+#  PermitRootLogin no替换为PermitRootLogin yes
+sed -i 's/PermitRootLogin\ no/PermitRootLogin\ yes/' /etc/ssh/sshd_config
+#将#PermitEmptyPasswords yes前面的#号去掉
+#将PermitEmptyPasswords 参数值修改为yes
+sed -i 's/\#PermitEmptyPasswords\ no/PermitEmptyPasswords\ yes/' /etc/ssh/sshd_config
+#重启sshd
+systemctl restart sshd
+##远程测试 非22端口加上 -p 端口号
+ssh root@127.0.0.1
+输入root密码
