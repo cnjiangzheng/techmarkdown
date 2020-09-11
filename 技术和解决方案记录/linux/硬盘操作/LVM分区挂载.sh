@@ -7,13 +7,13 @@ p
 t
 8e
 w
-" |fdisk /dev/xvde
+" |fdisk /dev/vdb
 
-pvcreate /dev/xvde1 
+pvcreate /dev/vdb1 
 
 pvdisplay
 
-vgcreate vg01 /dev/xvde1
+vgcreate vg01 /dev/vdb1
 
 lvcreate -l 100%FREE -n lvdata vg01
 mkfs.ext4 /dev/vg01/lvdata
